@@ -6,6 +6,7 @@ Program is hardware agnostic, for reusability.
 from logger import Logger
 from threading import Thread, Event
 import time
+from threads import rx_thread, tx_thread
 try:
     from init import ser, log_path
 except Exception as e:
@@ -15,34 +16,21 @@ except Exception as e:
 log = Logger(log_path)
 run_event = Event()
 
-def rx_thread():
-    """Waits for read and logs"""
-    while run_event.is_set():
-        if ser.in_waiting > 0:
-            data = ser.readline().decode().strip()
-            print(data)
-            log.log(('RX',data))
-        else:
-            time.sleep(0.025)
-
-def tx_thread():
-    """Waits for write and logs"""
-    while True:
-        try:
-            data = input().strip()
-            ser.write(data.encode() + b'\n')
-            print(data.strip())
-            log.log(('TX',data))
-        except KeyboardInterrupt:
-            run_event.clear()
-            break
-    
 run_event.set()
-reader_thread = Thread(target=rx_thread, daemon=True)
+reader_thread = Thread(target=rx_thread, args=(ser, log, run_event), daemon=True)
 reader_thread.start()
 
-tx_thread()
+writer_thread = Thread(target=tx_thread, args=(ser, log, run_event), daemon=True)
+writer_thread.start()
 
+while True:
+    try:
+        time.sleep(1)
+    except KeyboardInterrupt:
+        run_event.clear()
+        break
+
+writer_thread.join()
 reader_thread.join()
 log.close()
 ser.close()
