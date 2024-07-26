@@ -5,7 +5,7 @@ class Logger:
     """Encapsulates logging lines to a file with a timestamp."""
     def __init__(self, filepath: str, mode='a'):
         self.file = open(filepath, mode)
-        self.lock = Lock()  # multithreading
+        self.lock = Lock()  # multithreading access lock
         
     def log(self, tuple_):
         with self.lock:
