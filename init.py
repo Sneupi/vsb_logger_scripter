@@ -1,30 +1,23 @@
-"""
-Get required variables to start program from command line args
-"""
+from gui.gui import GUI
+import verify
 
-import serial
-import sys
-import os
+args = None
 
-# module variables we need
-__all__ = ['ser', 'log_path']
+def _verify_and_close(gui: GUI):
+    """Close GUI iff all inputs are valid."""
+    try:
+        global args
+        verify.serial(gui.get_port(), gui.get_baud())
+        verify.log_path(gui.get_path())
+        args = (gui.get_port(), int(gui.get_baud()), gui.get_path())
+        gui.quit()
+        gui.destroy()
+    except Exception as e:
+        print("\033[1;31m[CONNECT]\033[0m ", e)
 
-# get arg strings
-try:
-    port = sys.argv[1]
-    baud = sys.argv[2]
-    log_path = sys.argv[3]
-except IndexError:
-    raise IndexError('Usage: python main.py port baud logfile')
-
-# attempt to open the serial port
-try:
-    ser = serial.Serial(port, baud)
-except serial.SerialException:
-    raise serial.SerialException(f'Couldn\'t open port {port.upper()} at baud {baud.upper()}.')
-
-# check log path
-if not os.path.exists(log_path):
-    raise FileNotFoundError(f'Log file does not exist: {log_path}')
-elif not log_path.endswith(('.csv', '.txt')):
-    raise OSError(f'Log file must end in .csv or .txt: {log_path}')
+def get_args():
+    """port, baud, and log path"""
+    gui = GUI()
+    gui.set_connect_button(lambda: _verify_and_close(gui))
+    gui.mainloop()  # blocking
+    return args

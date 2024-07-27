@@ -12,12 +12,12 @@ from threading import Thread, Event
 import time
 from threads import serial_thread
 from queue import Queue
-try:
-    from init import ser, log_path
-except Exception as e:
-    print(f"\033[91m[INIT ERR]\033[0m {e}")
-    exit(1)
+import init
+from serial import Serial
 
+port, baud, log_path = init.get_args()
+
+ser = Serial(port, baud, timeout=1)
 tx_queue = Queue()
 log = Logger(log_path)
 run_serial = Event()
