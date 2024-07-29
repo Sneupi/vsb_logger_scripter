@@ -22,13 +22,13 @@ ser = Serial(port, baud, timeout=1)
 tx_queue = Queue()
 log = Logger(log_path)
 run_serial = Event()
-
-run_serial.set()
-ser_thread = Thread(target=serial_thread, args=(ser, log, run_serial, tx_queue), daemon=True)
-ser_thread.start()
-
 gui = MainGUI()
 gui.set_send_func(lambda event: tx_queue.put(gui.get_cli_entry()))
+
+run_serial.set()
+ser_thread = Thread(target=serial_thread, args=(ser, log, run_serial, tx_queue, gui), daemon=True)
+ser_thread.start()
+
 gui.mainloop()  # Blocking
 
 run_serial.clear()

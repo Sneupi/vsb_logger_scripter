@@ -10,7 +10,7 @@ class LED(tk.Frame):
         self.led.place(relx=0, rely=0, relwidth=0.1, relheight=1)
     def set_state(self, state):
         if state:
-            self.led.config(bg="green")
+            self.led.config(bg="light green")
         else:
             self.led.config(bg="red")
         
