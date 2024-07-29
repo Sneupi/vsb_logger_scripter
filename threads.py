@@ -18,6 +18,7 @@ def serial_thread(ser: Serial, log: Logger, run_event: Event, tx_queue: Queue):
         if not tx_queue.empty():
             data = str(tx_queue.get()).strip()
             ser.write(data.encode() + b'\n')
+            print(data)
             log.log(('TX',data))
             
         # Neither, sleep

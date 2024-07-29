@@ -10,6 +10,7 @@ class GUI(tk.Tk):
         self.selector.pack()
         self.connector = SerialConnector(self)
         self.connector.pack()
+        self.protocol("WM_DELETE_WINDOW", lambda: quit())
     
     def set_connect_button(self, command):
         self.connector.set_connect_button(command)

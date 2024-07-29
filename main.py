@@ -14,6 +14,7 @@ from threads import serial_thread
 from queue import Queue
 import init
 from serial import Serial
+from gui.maingui import MainGUI
 
 port, baud, log_path = init.get_args()
 
@@ -26,14 +27,11 @@ run_serial.set()
 ser_thread = Thread(target=serial_thread, args=(ser, log, run_serial, tx_queue), daemon=True)
 ser_thread.start()
 
-# block main until keyboard interrupt
-while True:
-    try:
-        tx_queue.put(input())
-    except KeyboardInterrupt:
-        # signal threads to stop
-        run_serial.clear()
-        break
+gui = MainGUI()
+gui.set_send_func(lambda event: tx_queue.put(gui.get_cli_entry()))
+gui.mainloop()  # Blocking
+
+run_serial.clear()
 
 ser_thread.join()
 log.close()
