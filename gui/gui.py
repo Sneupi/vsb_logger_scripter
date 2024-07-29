@@ -6,7 +6,7 @@ from .connector import SerialConnector
 class GUI(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.selector = FileSelector(self)
+        self.selector = FileSelector(self, text="Logfile")
         self.selector.pack()
         self.connector = SerialConnector(self)
         self.connector.pack()
